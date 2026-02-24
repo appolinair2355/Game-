@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🏎️ NEON RACER - Jeu de Voiture</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <!-- Particules d'arrière-plan -->
+        <div id="bgParticles"></div>
+        
+        <!-- HUD Futuriste -->
+        <div id="hud">
+            <div class="hud-panel" id="scorePanel">
+                <div class="hud-label">SCORE</div>
+                <div class="hud-value" id="score">0</div>
+                <div class="hud-glow"></div>
+            </div>
+            
+            <div class="hud-panel level-panel" id="levelPanel">
+                <div class="level-ring">
+                    <div class="level-number" id="level">1</div>
+                    <svg class="level-svg" viewBox="0 0 100 100">
+                        <circle class="level-bg" cx="50" cy="50" r="45"/>
+                        <circle class="level-progress" id="levelProgress" cx="50" cy="50" r="45"/>
+                    </svg>
+                </div>
+                <div class="hud-label">NIVEAU</div>
+                <div class="hud-glow"></div>
+            </div>
+            
+            <div class="hud-panel" id="pointsPanel">
+                <div class="hud-label">MULTIPLICATEUR</div>
+                <div class="hud-value multiplier" id="pointsPerLevel">x1</div>
+                <div class="hud-glow"></div>
+            </div>
+        </div>
+        
+        <!-- Barre de progression niveau -->
+        <div id="levelBarContainer">
+            <div class="level-bar-bg">
+                <div class="level-bar-fill" id="levelBarFill"></div>
+                <div class="level-bar-shine"></div>
+            </div>
+            <div class="level-bar-text">
+                <span id="carsPassed">0</span> / <span id="carsNeeded">5</span> VOITURES
+            </div>
+        </div>
+        
+        <!-- Canvas avec effets -->
+        <div id="canvasWrapper">
+            <canvas id="gameCanvas"></canvas>
+            <div id="speedLines"></div>
+            <div id="vignette"></div>
+        </div>
+        
+        <!-- Écran de démarrage -->
+        <div id="startScreen" class="screen">
+            <div class="screen-bg"></div>
+            <div class="content">
+                <h1 class="glitch" data-text="NEON RACER">NEON RACER</h1>
+                <div class="subtitle">SYSTÈME DE NIVEAUX ACTIVÉ</div>
+                
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <div class="feature-text">Dépasse pour gagner des points</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <div class="feature-text">Vitesse augmente à chaque niveau</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔥</div>
+                        <div class="feature-text">Niveau 1 = x1, Niveau 2 = x2...</div>
+                    </div>
+                </div>
+                
+                <button id="startBtn" class="neon-btn">
+                    <span class="btn-text">🚀 INITIALISER</span>
+                    <span class="btn-glow"></span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Écran Game Over -->
+        <div id="gameOverScreen" class="screen hidden">
+            <div class="screen-bg red"></div>
+            <div class="content">
+                <h2 class="crash-text">💥 CRASH 💥</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">SCORE FINAL</div>
+                        <div class="stat-value" id="finalScore">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">NIVEAU MAX</div>
+                        <div class="stat-value" id="finalLevel">1</div>
+                    </div>
+                </div>
+                
+                <button id="restartBtn" class="neon-btn red">
+                    <span class="btn-text">🔄 REDÉMARRER</span>
+                    <span class="btn-glow"></span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Écran Pause -->
+        <div id="pauseScreen" class="screen hidden">
+            <div class="screen-bg"></div>
+            <div class="content">
+                <h2 class="pause-text">⏸️ PAUSE</h2>
+                <div class="pause-pulse"></div>
+                <button id="resumeBtn" class="neon-btn">
+                    <span class="btn-text">▶️ REPRENDRE</span>
+                    <span class="btn-glow"></span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Notification Level Up -->
+        <div id="levelUpNotif" class="hidden">
+            <div class="notif-content">
+                <div class="notif-title">NIVEAU SUPÉRIEUR !</div>
+                <div class="notif-level" id="notifLevel">2</div>
+                <div class="notif-bonus">MULTIPLICATEUR x<span id="notifMult">2</span></div>
+            </div>
+            <div class="notif-rays"></div>
+        </div>
+        
+        <!-- Combo indicator -->
+        <div id="comboDisplay" class="hidden">
+            <div class="combo-text">COMBO!</div>
+            <div class="combo-count" id="comboCount">x3</div>
+        </div>
+        
+        <!-- Contrôles tactiles -->
+        <div id="controls">
+            <button id="leftBtn" class="control-btn">
+                <div class="btn-inner">
+                    <span class="arrow">◀</span>
+                    <span class="btn-label">GAUCHE</span>
+                </div>
+                <div class="btn-ripple"></div>
+            </button>
+            
+            <button id="pauseBtn" class="control-btn pause">
+                <div class="btn-inner">
+                    <span class="icon">⏸</span>
+                    <span class="btn-label">PAUSE</span>
+                </div>
+                <div class="btn-ripple"></div>
+            </button>
+            
+            <button id="rightBtn" class="control-btn">
+                <div class="btn-inner">
+                    <span class="arrow">▶</span>
+                    <span class="btn-label">DROITE</span>
+                </div>
+                <div class="btn-ripple"></div>
+            </button>
+        </div>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>
